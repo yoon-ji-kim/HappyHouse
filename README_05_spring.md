@@ -51,4 +51,4 @@
 10. 아파트 실거래가 검색 : 동 별 검색
 ![image](/uploads/0bc50d38c53d721e7dd17fda71789f08/image.png)
 11. 아파트 실거래가 검색 : 검색창을 통한 목록
-![search](/uploads/9533a6a0a8218df7721ea77bb22fb7ee/search.PNG)
+![image](/uploads/b3de59fe5540b2c67883da038da9cfc7/image.png)
