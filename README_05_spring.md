@@ -46,5 +46,7 @@
 ![modifyPassword](/uploads/401a644774314e77b2652a64d75e28b5/modifyPassword.PNG)
 8. 회원 정보 삭제 
 ![image](/uploads/453d609a38730f49342fdbd1f5e8c31a/image.png)
-9. 아파트 실거래가 검색 : 동 별 검색
+9. 공지사항 페이지
+![image](/uploads/75b793062ef904f2fecd60be4ae2972e/image.png)
+10. 아파트 실거래가 검색 : 동 별 검색
 ![image](/uploads/0bc50d38c53d721e7dd17fda71789f08/image.png)
