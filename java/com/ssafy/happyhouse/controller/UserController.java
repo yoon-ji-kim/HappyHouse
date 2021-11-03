@@ -96,4 +96,9 @@ public class UserController {
 		session.invalidate();
 		return resEntity;
 	}
+	
+	@GetMapping("/list") //추가
+    public String list() {
+        return "user/list";
+    }
 }

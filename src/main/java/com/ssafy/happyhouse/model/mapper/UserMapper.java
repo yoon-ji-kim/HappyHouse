@@ -1,6 +1,7 @@
 package com.ssafy.happyhouse.model.mapper;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import com.ssafy.happyhouse.model.User;
@@ -12,4 +13,7 @@ public interface UserMapper {
 	User getUser(String id) throws SQLException; //회원정보 
 	void updatePwd(String id,String pass) throws SQLException; //회원정보 수정
 	void deleteUser(String id)throws SQLException; //회원탈퇴
+	
+	void updateUser(User user) throws Exception;
+	List<User> listUser() throws Exception;
 }

@@ -1,5 +1,6 @@
 package com.ssafy.happyhouse.model.service;
 
+import java.util.List;
 import java.util.Map;
 
 import com.ssafy.happyhouse.model.User;
@@ -11,4 +12,8 @@ public interface UserService {
 	User getUser(String id) throws Exception; //회원정보 
 	void updatePwd(String id,String pass)  throws Exception; //회원정보 수정
 	void deleteUser(String id) throws Exception; //회원탈퇴
+	
+	List<User> listUser() throws Exception;
+	
+	void updateUser(User user) throws Exception;
 }

@@ -1,5 +1,6 @@
 package com.ssafy.happyhouse.model.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
@@ -43,5 +44,15 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void deleteUser(String id) throws Exception {
 		sqlsession.getMapper(UserMapper.class).deleteUser(id);
+	}
+
+	@Override
+	public List<User> listUser() throws Exception {
+		return sqlsession.getMapper(UserMapper.class).listUser();
+	}
+
+	@Override
+	public void updateUser(User user) throws Exception {
+		sqlsession.getMapper(UserMapper.class).updateUser(user);		
 	}
 }

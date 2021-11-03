@@ -35,5 +35,14 @@ public class HappyHouseMapServiceImpl implements HappyHouseMapService {
 	public List<HouseInfoDto> getAptInDong(String dong) throws Exception {
 		return sqlsession.getMapper(HouseMapMapper.class).getAptInDong(dong);
 	}
-
+	
+	@Override
+	public void registInterest(String id, String sidocode,String guguncode, String dongcode) throws Exception{
+		sqlsession.getMapper(HouseMapMapper.class).registInterest(id, sidocode, guguncode, dongcode);
+	}
+	
+	@Override
+	public List<HouseInfoDto> getAll(String word) throws Exception{
+		return sqlsession.getMapper(HouseMapMapper.class).getAll(word);
+	}
 }

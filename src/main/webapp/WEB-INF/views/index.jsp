@@ -23,6 +23,7 @@
 					,success:function(){
 						alert("로그인 성공");
 						$("#loginModal").modal("hide");
+						location.reload();
 					}
 				});
 			}
@@ -112,54 +113,43 @@
 				});
 			}
 		});//회원 탈퇴
+		$("#searchBtn").click(function(){
+			var word = $("#word").val();
+			console.log(word);
+			if(!$("#word").val()){
+				alert("검색할 단어를 입력하세요");
+				return;
+			}
+			$.ajax({
+				type: "GET"
+				,url: 'map/getAll'
+				,data: { word :word }
+				,success:function(data){
+					$("tbody").empty();
+					$.each(data,function(index, vo) {
+						let str = `
+							<tr class= <%="${colorArr[index%3]}"%> >
+								<td> <%="${[index+1]}"%></td>
+	                            <td><%="${vo.aptName}"%></a></td>
+	                            <td><%= "${vo.sidoName} ${vo.gugunName} ${vo.dongName} ${vo.jibun}"%></td>
+	                            <td><%="${vo.buildYear}"%></td>
+	                            <td><%="${vo.recentPrice}"%></td>
+	                    	</tr>
+						`;
+						$("tbody").append(str);
+					});
+				}
+			});
+		});//search
 	});//end
 </script>
 <body>
-	<div class="container">
-		<header id="index_header" class="jumbotron text-center mb-1">
-			<h4>Happy House</h4> 
-		</header>
-		<nav class="navbar navbar-expand-sm bg-dark navbar-dark rounded">
-			<ul class="navbar-nav">
-				<li class="nav-item">
-					<a class="nav-link" href="#">Home</a>
-				</li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-						동네 정보
-					</a>
-					<div class="dropdown-menu">
-						<a class="dropdown-item" href="#">APT 매매</a>
-						<a class="dropdown-item" href="#">APT 전월세</a>
-						<a class="dropdown-item" href="#">주택 매매</a>
-						<a class="dropdown-item" href="#">주택 전월세</a>
-						<a class="dropdown-item" href="#">상권 정보</a>
-						<a class="dropdown-item" href="#">환경 정보</a>
-					</div>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">Notice</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">News</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">Contact</a>
-				</li>
-			</ul>
-			<div class="collapse navbar-collapse justify-content-end">
-				<c:if test="${empty userinfo}">
-				<ul class="navbar-nav" id ="id_notConfirm">
-					<li class="nav-item">
-						<a class="nav-link" href="#" data-toggle="modal" data-target="#loginModal">로그인</a>
-					</li>
-					<li class="nav-item">
-						<a class="nav-link" href="#" data-toggle="modal" data-target="#registModal">회원가입</a>
-					</li>
-				</ul>
-				</c:if>
+	<%@ include file="/WEB-INF/views/include/confirm.jsp" %>
 				<c:if test="${!empty userinfo}">
 				<ul class="navbar-nav" id="id_Confirm">
+					<li class="nav-linke" style = "color : white; margin-top : 8px">
+						${userinfo.id} 님 안녕하세요!
+					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="${root}/user/logout" >로그아웃</a>
 					</li>
@@ -168,6 +158,14 @@
 					</li>
 				</ul>
 				</c:if>
+
+				<c:if test="${userinfo.id eq 'admin'}">
+	                <ul class="navbar-nav" id ="eqadmin">
+	                    <li class="nav-item">
+	                        <a class="nav-link" href="${root}/user/list">전체회원목록</a>
+	                    </li>
+	                </ul>
+                </c:if>
 			</div>
 		</nav>
 		<!-- 로그인 모달 -->
@@ -230,7 +228,7 @@
 				</div>
 			</div>
 		</div>
-		<!-- 회원s 수정 모달 -->
+		<!-- 회원 수정 모달 -->
 		<div class="container">
 			<div class="modal fade" id="modifyModal">
 				<div class="modal-dialog modal-dialog-centered">
@@ -280,6 +278,12 @@
 						<option value="0">선택</option>
 					</select>
 					<button type="button" id="aptSearchBtn">검색</button>
+					<input type="text" id="word" name="word" placeholder="동 이름으로 검색">
+					<button type="button" id="searchBtn">검색</button>
+						
+					<c:if test="${!empty userinfo}">
+						<button type="button" id="interestBtn">관심지역 등록</button>
+					</c:if>
 					<table class="table mt-2">
 						<colgroup>
 							<col width="100">
@@ -303,118 +307,128 @@
 				<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=e46a259ae651b46189dba64791c30aed&libraries=services"></script>
 				<script type="text/javascript" src="js/map.js"></script>
 				<script type="text/javascript">
-				let colorArr = ['table-primary','table-success','table-danger'];
-				$(document).ready(function(){					
-					$.get(root + "/map/sido"   
-						,function(data, status){
-							$.each(data, function(index, vo) {
-								$("#sido").append("<option value='"+vo.sidoCode+"'>"+vo.sidoName+"</option>");
+					let colorArr = ['table-primary','table-success','table-danger'];
+					$(document).ready(function(){					
+						$.get(root + "/map/sido"   
+							,function(data, status){
+								$.each(data, function(index, vo) {
+									$("#sido").append("<option value='"+vo.sidoCode+"'>"+vo.sidoName+"</option>");
+								});
+							}
+							, "json"
+						);
+					});
+					$(document).on("change", "#sido", function() {
+						$.get(root + "/map/gugun"
+								,{sido: $("#sido").val()}
+								,function(data, status){
+									$("#gugun").empty();
+									$("#gugun").append('<option value="0">선택</option>');
+									$.each(data, function(index, vo) {
+										$("#gugun").append("<option value='"+vo.gugunCode+"'>"+vo.gugunName+"</option>");
+									});
+								}
+								, "json"
+						);
+					});
+					$(document).on("change", "#gugun", function() {
+						$.get(root + "/map/dong"
+								,{gugun: $("#gugun").val()}
+								,function(data, status){
+									$("#dong").empty();
+									$("#dong").append('<option value="0">선택</option>');
+									$.each(data, function(index, vo) {
+										$("#dong").append("<option value='"+vo.dongCode+"'>"+vo.dongName+"</option>");
+									});
+								}
+								, "json"
+						);
+					});
+					$(document).on("change", "#dong", function() {
+						$.get(root + "/map/apt"
+								,{dong: $("#dong").val()}
+								,function(data, status){
+									$("tbody").empty();
+									$.each(data, function(index, vo) {
+										let str = `
+											<tr class= <%="${colorArr[index%3]}"%> >
+	                                            <td> <%="${vo.aptCode}"%> </td>
+	                                            <td><a href="" data-toggle="modal" date-target="#aptModal"><%="${vo.aptName}"%></a></td>
+	                                            <td><%= "${vo.sidoName} ${vo.gugunName} ${vo.dongName} ${vo.jibun}"%></td>
+	                                            <td><%="${vo.buildYear}"%></td>
+	                                            <td><%="${vo.recentPrice}"%></td>
+                                        	</tr>
+										`;
+										$("tbody").append(str);
+									});
+									displayMarkers(data);
+								}
+								, "json"
+						);
+					});
+					$(document).on("click", "#interestBtn", function() { //관심지역 등록
+						var userid = "${userinfo.id}";
+						var sidocode =  $("#sido").val();
+						var guguncode =  $("#gugun").val();
+						var dongcode =  $("#dong").val();
+						console.log(userid+" "+ sidocode+" "+guguncode+" "+dongcode);
+						if(sidocode == 0 || guguncode ==0 || dongcode ==0){
+							alert("관심 지역을 선택해 주세요");
+							return;
+						}else{
+							$.ajax({
+								type: "POST"
+								,url: "map/interest"
+								,dataType: "text"
+								,data: {
+									id : userid
+									,sidoCode: sidocode
+									,gugunCode: guguncode
+									,dongCode : dongcode
+								}
+								,success:function(){
+									alert("관심지역 등록완료");
+								}
 							});
 						}
-						, "json"
-					);
-				});
-				$(document).on("change", "#sido", function() {
-					$.get(root + "/map/gugun"
-							,{sido: $("#sido").val()}
-							,function(data, status){
-								$("#gugun").empty();
-								$("#gugun").append('<option value="0">선택</option>');
-								$.each(data, function(index, vo) {
-									$("#gugun").append("<option value='"+vo.gugunCode+"'>"+vo.gugunName+"</option>");
-								});
-							}
-							, "json"
-					);
-				});
-				$(document).on("change", "#gugun", function() {
-					$.get(root + "/map/dong"
-							,{gugun: $("#gugun").val()}
-							,function(data, status){
-								$("#dong").empty();
-								$("#dong").append('<option value="0">선택</option>');
-								$.each(data, function(index, vo) {
-									$("#dong").append("<option value='"+vo.dongCode+"'>"+vo.dongName+"</option>");
-								});
-							}
-							, "json"
-					);
-				});
-				$(document).on("change", "#dong", function() {
-					$.get(root + "/map/apt"
-							,{dong: $("#dong").val()}
-							,function(data, status){
-								$("tbody").empty();
-								$.each(data, function(index, vo) {
-									let str = `
-										<tr class="${colorArr[index%3]}">
-											<td>${vo.aptCode}</td>
-											<td><a href="" data-toggle="modal" date-target="#aptModal">${vo.aptName}</a></td>
-											<td>${vo.sidoName} ${vo.gugunName} ${vo.dongName} ${vo.jibun}</td>
-											<td>${vo.buildYear}</td>
-											<td>${vo.recentPrice}</td>
-										</tr>
-									`;
-									$("tbody").append(str);
-								});
-								displayMarkers(data);
-							}
-							, "json"
-					);
-				});
-				
-				$(document).on("click", "#aptSearchBtn", function() {
-					var param = { //공공데이터 키
-							serviceKey:'2LlEyKxqr1YfX0CBc7emYGAsWH2IYBHaW3/aUCe68sdkVkrNRiRCjvdwbGZ3Z4MqvbUQTa+gMx0sxGXW/4fsrA==',
-							pageNo:encodeURIComponent('1'),
-							numOfRows:encodeURIComponent('100'),
-							LAWD_CD:encodeURIComponent($("#gugun").val()),
-							DEAL_YMD:encodeURIComponent('202110')
-					};
-					$.get('http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev'
-							,param
-							,function(data, status){
-								var items = $(data).find('item');
-								var jsonArray = new Array();
-								items.each(function() {
-									var jsonObj	= new Object();
-									jsonObj.aptCode = $(this).find('일련번호').text();
-									jsonObj.aptName = $(this).find('아파트').text();
-									jsonObj.dongCode = $(this).find('법정동읍면동코드').text();
-									//법정도읍면동 코드로  법정동코드로 dongName,sidoName,gugunName얻어내기
-									//jsonObj.dongName = ;
-									//jsonObj.sidoName = ;
-									//jsonObj.gugunName = ;
-									jsonObj.buildYear = $(this).find('건축년도').text();
-									jsonObj.jibun = $(this).find('지번').text();
-									jsonObj.recentPirce = $(this).find('거래금액').text();
-										
-									jsonObj = JSON.stringify(jsonObj);
-									//String 형태로 파싱한 객체를 다시 json으로 변환
-									jsonArray.push(JSON.parse(jsonObj));
-								});
-								console.log(jsonArray);
-								//displayMarkers(jsonArray);
-							}
-							, "xml"
-					);
-					/* var xhr = new XMLHttpRequest();
-					var url = 'http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev';
-					var queryParams = '?' + encodeURIComponent('serviceKey') + '='+encodeURIComponent(' API KEY ');
-					queryParams += '&' + encodeURIComponent('pageNo') + '=' + encodeURIComponent('1'); 
-					queryParams += '&' + encodeURIComponent('numOfRows') + '=' + encodeURIComponent('10'); 
-					queryParams += '&' + encodeURIComponent('LAWD_CD') + '=' + encodeURIComponent($("#gugun").val()); 
-					queryParams += '&' + encodeURIComponent('DEAL_YMD') + '=' + encodeURIComponent('202110'); 
-					xhr.open('GET', url + queryParams);
-					xhr.onreadystatechange = function () {
-					    if (this.readyState == 4) {
-					    	console.log(this.responseXML);
-					        alert('Status: '+this.status+'nHeaders: '+JSON.stringify(this.getAllResponseHeaders())+'nBody: '+this.responseText);
-					    }
-					};
-
-					xhr.send(''); */
-				});
+					});
+					$(document).on("click", "#aptSearchBtn", function() {
+						var param = { //공공데이터 키
+								serviceKey:'2LlEyKxqr1YfX0CBc7emYGAsWH2IYBHaW3/aUCe68sdkVkrNRiRCjvdwbGZ3Z4MqvbUQTa+gMx0sxGXW/4fsrA==',
+								pageNo:encodeURIComponent('1'),
+								numOfRows:encodeURIComponent('100'),
+								LAWD_CD:encodeURIComponent($("#gugun").val()),
+								DEAL_YMD:encodeURIComponent('202110')
+						};
+						$.get('http://openapi.molit.go.kr/OpenAPI_ToolInstallPackage/service/rest/RTMSOBJSvc/getRTMSDataSvcAptTradeDev'
+								,param
+								,function(data, status){
+									console.log(data);
+									var items = $(data).find('item');
+									var jsonArray = new Array();
+									items.each(function() {
+										var jsonObj	= new Object();
+										jsonObj.aptCode = $(this).find('일련번호').text();
+										jsonObj.aptName = $(this).find('아파트').text();
+										jsonObj.dongCode = $(this).find('법정동읍면동코드').text();
+										//법정도읍면동 코드로  법정동코드로 dongName,sidoName,gugunName얻어내기
+										//jsonObj.dongName = ;
+										//jsonObj.sidoName = ;
+										//jsonObj.gugunName = ;
+										jsonObj.buildYear = $(this).find('건축년도').text();
+										jsonObj.jibun = $(this).find('지번').text();
+										jsonObj.recentPirce = $(this).find('거래금액').text();
+											
+										jsonObj = JSON.stringify(jsonObj);
+										//String 형태로 파싱한 객체를 다시 json으로 변환
+										jsonArray.push(JSON.parse(jsonObj));
+									});
+									console.log(jsonArray);
+									displayMarkers(jsonArray);
+								}
+								, "xml"
+						);
+					});
 				</script>
 				</div>
 			</div>

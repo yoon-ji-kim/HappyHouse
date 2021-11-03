@@ -25,7 +25,7 @@
 |추가|관심지역 동네 업종 정보||X|
 |추가|관심지역 대기 오염 정보||X|
 |심화||웹사이트 소개|X|
-|심화||공지사항|X|
+|심화||공지사항|O|
 
 ### 실행화면 캡쳐 - 
 
@@ -50,3 +50,5 @@
 ![image](/uploads/75b793062ef904f2fecd60be4ae2972e/image.png)
 10. 아파트 실거래가 검색 : 동 별 검색
 ![image](/uploads/0bc50d38c53d721e7dd17fda71789f08/image.png)
+11. 아파트 실거래가 검색 : 검색창을 통한 목록
+![search](/uploads/9533a6a0a8218df7721ea77bb22fb7ee/search.PNG)

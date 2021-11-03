@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,5 +41,11 @@ public class HappyHouseMapController {
 	@GetMapping(value = "/apt")
 	public ResponseEntity<List<HouseInfoDto>> apt(@RequestParam("dong") String dong) throws Exception{ 		//아파트 정보
 	return new ResponseEntity<List<HouseInfoDto>> (happyHouseMapService.getAptInDong(dong), HttpStatus.OK);
+	}
+	
+	@GetMapping(value ="/getAll")
+	public ResponseEntity<List<HouseInfoDto>> all(@RequestParam("word") String word) throws Exception{
+		word = "%"+word+"%";
+		return new ResponseEntity<List<HouseInfoDto>>(happyHouseMapService.getAll(word), HttpStatus.OK);
 	}
 }
